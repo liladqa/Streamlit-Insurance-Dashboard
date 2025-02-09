@@ -19,4 +19,3 @@ def view_all_data():
     data = c.fetchall()
     return data
 
-
