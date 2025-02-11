@@ -4,6 +4,7 @@ import plotly.express as px
 from streamlit_option_menu import option_menu
 from numerize.numerize import numerize
 from query import *
+import time
 
 st.set_page_config(page_title="Dashboard", page_icon="🌍", layout="wide")
 st.subheader("🔔 Insurance Descriptive Analytics")
@@ -19,7 +20,7 @@ df = pd.DataFrame(result, columns=["Columns",
                                    "Region",
                                    "Investment",
                                    "Construction",
-                                   "Business Type",
+                                   "BusinessType",
                                    "Earthquake",
                                    "Flood",
                                    "Rating",
@@ -93,6 +94,66 @@ def Home():
 
 Home()
 
+def Graphs():
+    #total_investment = int(df_selection["Investment"]).sum()
+    #average_rating = int(round(df_selection["Rating"]).mean(), 2)
 
+    investment_by_business_type = (df_selection.groupby(by=["BusinessType"]).count()[["Investment"]].sort_values(by="Investment"))
 
+    #simple bar chart
+    fig_investment = px.bar(
+        investment_by_business_type,
+        x="Investment",
+        y=investment_by_business_type.index,
+        orientation="h",
+        title="<b> Investmnet by Business Type </b>",
+        color_discrete_sequence=["#0083b8"]*len(investment_by_business_type),
+        template="plotly_white"
+    )
 
+    fig_investment.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis =(dict(showgrid=False))
+    )
+
+    #simple line chart
+    investment_state = df_selection.groupby(by=["State"]).count()[["Investment"]] 
+    fig_state = px.line(
+        investment_state,
+        x=investment_state.index,
+        y="Investment",
+        orientation="v",
+        title="<b> Investmnet by Business State </b>",
+        color_discrete_sequence=["#0083b8"]*len(investment_state),
+        template="plotly_white"
+    )
+
+    fig_state.update_layout(
+        xaxis =dict(tickmode="linear"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        yaxis =(dict(showgrid=False))
+    )
+    
+    left, right = st.columns(2)
+    left.plotly_chart(fig_state, use_container_width=True)
+    right.plotly_chart(fig_investment, use_container_width=True)
+
+Graphs()
+
+def Progressbar():
+    st.markdown("""<style>.stProgress > div > div > div > div { background-image: linear-gradient(to right, #99ff99 , #FFFF00)}</style>""",unsafe_allow_html=True)
+    target=3000000000
+    current=df_selection["Investment"].sum()
+    percent=round((current/target*100))
+    mybar=st.progress(0)
+
+    if percent>100:
+        st.subheader("Target done")
+
+    else:
+        st.write("you have ", percent, "% ", "of ", (format(target, 'd')), "TZS")
+        for percent_complete in range(percent):
+            time.sleep(0.1)
+            mybar.progress(percent_complete+1, text=" Target Percentage")
+
+Progressbar()
