@@ -92,7 +92,6 @@ def Home():
 
     st.markdown("""---""")
 
-Home()
 
 def Graphs():
     #total_investment = int(df_selection["Investment"]).sum()
@@ -138,8 +137,6 @@ def Graphs():
     left.plotly_chart(fig_state, use_container_width=True)
     right.plotly_chart(fig_investment, use_container_width=True)
 
-Graphs()
-
 def Progressbar():
     st.markdown("""<style>.stProgress > div > div > div > div { background-image: linear-gradient(to right, #99ff99 , #FFFF00)}</style>""",unsafe_allow_html=True)
     target=3000000000
@@ -156,4 +153,35 @@ def Progressbar():
             time.sleep(0.1)
             mybar.progress(percent_complete+1, text=" Target Percentage")
 
-Progressbar()
+
+def sideBar():
+    with st.sidebar:
+        selected=option_menu(
+            menu_title="Main Menu",
+            options=["Home", "Progress"],
+            icons=["house", "eye"],
+            menu_icon="cast",
+            default_index=0 
+        )
+    if selected=="Home":
+        st.subheader(f"Page: {selected}")
+        Home()
+        Graphs()
+    elif selected=="Progress":
+        st.subheader(f"Page: {selected}")
+        Progressbar()
+        Graphs()
+
+sideBar()
+
+#theme
+hide_st_style="""
+
+<style>
+#MainMenu {visibility: hidden; }
+footer {visibility: hidden; }
+header {visibility: hidden; }
+</style>
+
+"""
+
